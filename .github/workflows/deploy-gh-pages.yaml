@@ -1,9 +1,9 @@
-name: Deploy to GitHub Pages
+name: GitHub Pages - deploy using pnpm
 
 on:
   push:
     branches:
-      - release # or the branch you want to trigger the deployment from
+      - release
 
 jobs:
   cache-and-install:
@@ -11,23 +11,24 @@ jobs:
     strategy:
       matrix:
         node-version: [20]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
+    steps:
+      - uses: actions/checkout@v4
+
+      # cache and install node and pnpm
+      - name: install pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
-
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: install Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
+      # install and build
       - name: install dependencies, build
-        run:  |
+        run: |
           pnpm install
           pnpm run build --if-present
 
@@ -36,9 +37,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
-
-    
-
-
-      
-
